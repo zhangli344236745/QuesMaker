@@ -1,6 +1,7 @@
 # build_files.sh
+which python3.9
 ls
-cd Python-*/
+cd /Python-*/
 yum install sqlite-devel -y
 ./configure --enable-optimizations --enable-loadable-sqlite-extensions
 make && make altinstall
