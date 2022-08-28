@@ -1,5 +1,6 @@
 # build_files.sh
 hostnamectl
+cat /etc/*-release
 apt-get update && apt-get install libsqlite3-dev sqlite-devel
 ./configure --enable-loadable-sqlite-extensions && make && make install
 pip install pysqlite
