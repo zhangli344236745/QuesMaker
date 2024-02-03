@@ -17,13 +17,28 @@ from django.contrib import admin
 from django.urls import path, include
 from django.conf.urls.static import static
 from django.conf import settings
+from drf_yasg.views import get_schema_view
+from drf_yasg import openapi
 
 admin.site.site_header = "QuesMaker Admin Portal"
 admin.site.site_title = "QuesMaker Admins"
 admin.site.index_title = "QuesMakers"
 
+schema_view = get_schema_view(
+    openapi.Info(
+        title="api document",
+        default_version= "v1",
+        terms_of_service="",
+        contact=openapi.Contact(email="344236745@qq.com"),
+        license=openapi.License(name="bsd"),
+    ),
+    public=True,
+)
+
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('drawapi/v1/', include('drawing.urls')),
     path('', include('home.urls', namespace='Home'), name='Home'),
     path('edit', include('editor.urls', namespace='Edit'), name='Edit'),
+    path('docs/',schema_view.with_ui("swagger",cache_timeout=0),name="scheme-swager-ui"),
 ]+ static(settings.MEDIA_URL, document_root= settings.MEDIA_ROOT)

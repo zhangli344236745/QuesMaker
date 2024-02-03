@@ -2,6 +2,13 @@ from django.http.response import HttpResponse
 from django.shortcuts import redirect, render
 from .models import QuestionPapers,Question
 from .forms import QuespaperForm, QuesForm
+from rest_framework import viewsets,status
+from rest_framework.views import APIView
+from rest_framework.viewsets import ModelViewSet
+from rest_framework.mixins import ListModelMixin,DestroyModelMixin
+from rest_framework.response import Response
+from .serializers import QuestionSerializer,QuestionPapersSerializer
+from django.http import Http404
 
 # Create your views here.
 def index(request):
@@ -11,7 +18,6 @@ def index(request):
         num = request.POST.get('num')
         img = request.FILES.get('img')
         oj = QuestionPapers.objects.get_or_create(subject = subject, num = num, img = img)
- 
         return redirect(f'/edit/{oj[0].id}/ques')
     
     return render(request, 'qpedit.html')
@@ -47,8 +53,6 @@ def qedit(request, id):
             return redirect(f'/edit/{obj.qpid.id}/ques')
         else:
             return render(request, 'qedit.html' , {'form': form, 'QP': obj.qpid})
-    
-
     return render(request, 'qedit.html' , {'form': form, 'QP': obj.qpid})
 
 
@@ -101,3 +105,69 @@ def qdel(request, id):
     qid = obj.qpid.id
     obj.delete()
     return redirect(f'/edit/qp/{qid}/ques')
+
+class Test2QuestionView(ModelViewSet):
+    serializer_class = QuestionSerializer
+    queryset = Question.objects.all()
+
+
+class TestQuestionView(APIView):
+    def get(self,request,pk):
+        try:
+            qv = Question.objects.get(id=pk)
+        except Question.DoesNotExist:
+            raise Http404
+        serializer = QuestionSerializer(qv)
+        print(serializer)
+        return Response(serializer.data,200)
+
+    def put(self,request,pk):
+        try:
+            qv = Question.objects.get(id=pk)
+        except Question.DoesNotExist:
+            raise Http404
+        serializer = QuestionSerializer(qv,data=request.data)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        print(serializer)
+        return Response(serializer.data,200)
+
+    def delete(self,request,pk):
+        try:
+            qv = Question.objects.get(id=pk)
+        except Question.DoesNotExist:
+            raise Http404
+        qv.delete()
+        return Response(status=status.HTTP_200_OK)
+
+
+class QustionViewSet(viewsets.ModelViewSet):
+    queryset = Question.objects.all()
+    serializer_class = QuestionSerializer
+
+
+class QuestionPapersList(APIView):
+    def get(self,request):
+        qp = QuestionPapers.objects.all()
+        serializer_list = QuestionPapersSerializer(qp,many=True)
+        return Response(serializer_list.data)
+
+class QuestionPapersDetail(APIView):
+    def get_object(self,pk):
+        try:
+            return QuestionPapers.objects.get(pk=pk)
+        except QuestionPapers.DoesNotExist:
+            raise Http404
+
+    def get(self,request,pk):
+        qp = self.get_object(pk)
+        serializer = QuestionPapersSerializer(qp)
+        return Response(serializer.data)
+
+    def put(self,request,pk):
+        qp = self.get_object(pk)
+        serializer = QuestionPapersSerializer(qp,data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
