@@ -20,7 +20,8 @@ class DataViewSet(ModelViewSet):
     queryset = Data.objects.all()
     serializer_class = DataSerializer
     filter_backends = (DjangoFilterBackend,)
-    filter_class = DrawingFilter
+    filter_class = DataFilter
+    search_fields = ('data_name','sensor')
 
 
 class DrawingViewSet(ModelViewSet):

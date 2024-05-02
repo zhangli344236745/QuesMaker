@@ -19,6 +19,8 @@ from django.conf.urls.static import static
 from django.conf import settings
 from drf_yasg.views import get_schema_view
 from drf_yasg import openapi
+from dvadmin.system.views.login import CaptchaView
+from system.views.login import LoginView
 
 admin.site.site_header = "QuesMaker Admin Portal"
 admin.site.site_title = "QuesMaker Admins"
@@ -37,8 +39,13 @@ schema_view = get_schema_view(
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('watch/', include('watchlist_app.urls')),
+    path('account/', include('user_app.urls')),
     path('drawapi/v1/', include('drawing.urls')),
+    path("api/login/", LoginView.as_view(), name="token_obtain_pair"),
+    path("api/captcha/", CaptchaView.as_view()),
     path('', include('home.urls', namespace='Home'), name='Home'),
     path('edit', include('editor.urls', namespace='Edit'), name='Edit'),
     path('docs/',schema_view.with_ui("swagger",cache_timeout=0),name="scheme-swager-ui"),
+    path("api/system/", include("system.urls")),
 ]+ static(settings.MEDIA_URL, document_root= settings.MEDIA_ROOT)

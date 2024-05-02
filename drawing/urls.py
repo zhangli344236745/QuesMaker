@@ -13,3 +13,6 @@ urlpatterns = [
 ]
 
 urlpatterns += router.urls
+
+for url in router.urls:
+    print("url:{}".format(url))

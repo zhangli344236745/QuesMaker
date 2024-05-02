@@ -38,16 +38,21 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'rest_framework.authtoken',
+    'system',
     'django_filters',
     'drf_yasg',
     'home',
     'editor',
     'drawing',
+    'user_app',
+    'watchlist_app',
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
+    'corsheaders.middleware.CorsMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.contrib.auth.middleware.AuthenticationMiddleware',
@@ -81,16 +86,24 @@ WSGI_APPLICATION = 'quesMaker.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql_psycopg2',
+#         'NAME': os.environ.get("DB_NAME"), # 数据库名称
+#         'USER': os.environ.get("DB_USER"), # 登录数据库用户名
+#         'PASSWORD': os.environ.get("DB_PASSWORD"), # 登录数据库密码
+#         'HOST': os.environ.get("DB_HOST") # 数据库服务器的主机地址
+#         #'PORT': '' # 数据库服务的端口号
+#     }
+# }
+
 DATABASES = {
     'default': {
-        #'ENGINE': 'django.db.backends.sqlite3',
-        #'NAME': BASE_DIR / 'db.sqlite3',
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': os.environ.get("DB_NAME"), # 数据库名称
-        'USER': os.environ.get("DB_USER"), # 登录数据库用户名
-        'PASSWORD': os.environ.get("DB_PASSWORD"), # 登录数据库密码
-        'HOST': os.environ.get("DB_HOST") # 数据库服务器的主机地址
-        #'PORT': '' # 数据库服务的端口号
+        'NAME': "verceldb", #os.environ.get("DB_NAME"), # 数据库名称
+        'USER': "default",#os.environ.get("DB_USER"), # 登录数据库用户名
+        'PASSWORD': "uVeE9bh6JRmU",# os.environ.get("DB_PASSWORD"), # 登录数据库密码
+        'HOST': "ep-summer-unit-589074-pooler.us-east-1.aws.neon.tech",#os.environ.get("DB_HOST") # 数据库服务器的主机地址
     }
 }
 
@@ -155,10 +168,68 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 
 REST_FRAMEWORK = {
+    "DATETIME_FORMAT": "%Y-%m-%d %H:%M:%S",  # 日期时间格式配置
+    "DATE_FORMAT": "%Y-%m-%d",
+    'DEFAULT_AUTHENTICATION_CLASSES':[
+       # 'rest_framework.authentication.TokenAuthentication',
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
+        "rest_framework.authentication.SessionAuthentication",
+    ],
     'DEFAULT_FILTER_BACKENDS':[
         'django_filters.rest_framework.DjangoFilterBackend',
         'rest_framework.filters.SearchFilter',
     ],
-    'DEFAULT_PAGINATION_CLASS':'rest_framework.pagination.PageNumberPagination',
-    'PAGE_SIZE':3,
+    "DEFAULT_PERMISSION_CLASSES": [
+        "rest_framework.permissions.IsAuthenticated",  # 只有经过身份认证确定用户身份才能访问
+        # 'rest_framework.permissions.IsAdminUser', # is_staff=True才能访问 —— 管理员(员工)权限
+        # 'rest_framework.permissions.AllowAny', # 允许所有
+        # 'rest_framework.permissions.IsAuthenticatedOrReadOnly', # 有身份 或者 只读访问(self.list,self.retrieve)
+    ],
+    # 'DEFAULT_PAGINATION_CLASS':'rest_framework.pagination.PageNumberPagination',
+    # 'PAGE_SIZE':3,
+    'DEFAULT_RENDERER_CLASSES':(
+        'rest_framework.renderers.JSONRenderer',
+    ),
+}
+
+CORS_ALLOW_METHODS = (
+    'GET',
+    'POST',
+    'PUT',
+    'PATCH',
+    'DELETE',
+    'OPTIONS'
+)
+
+CORS_ALLOW_HEADERS = (
+    'XMLHttpRequest',
+    'X_FILENAME',
+    'accept-encoding',
+    'authorization',
+    'content-type',
+    'dnt',
+    'origin',
+    'user-agent',
+    'x-csrftoken',
+    'x-requested-with',
+    'Pragma',
+)
+
+CORS_ALLOW_CREDENTIALS = True
+CORS_ORIGIN_ALLOW_ALL = True
+
+
+# ================================================= #
+# ****************** simplejwt配置 ***************** #
+# ================================================= #
+from datetime import timedelta
+
+SIMPLE_JWT = {
+    # token有效时长
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=120),
+    # token刷新后的有效时间
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
+    # 设置前缀
+    "AUTH_HEADER_TYPES": ("JWT",),
+    "ROTATE_REFRESH_TOKENS": True,
 }
