@@ -86,26 +86,17 @@ WSGI_APPLICATION = 'quesMaker.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/3.2/ref/settings/#databases
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-#         'NAME': os.environ.get("DB_NAME"), # 数据库名称
-#         'USER': os.environ.get("DB_USER"), # 登录数据库用户名
-#         'PASSWORD': os.environ.get("DB_PASSWORD"), # 登录数据库密码
-#         'HOST': os.environ.get("DB_HOST") # 数据库服务器的主机地址
-#         #'PORT': '' # 数据库服务的端口号
-#     }
-# }
-
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': "verceldb", #os.environ.get("DB_NAME"), # 数据库名称
-        'USER': "default",#os.environ.get("DB_USER"), # 登录数据库用户名
-        'PASSWORD': "uVeE9bh6JRmU",# os.environ.get("DB_PASSWORD"), # 登录数据库密码
-        'HOST': "ep-summer-unit-589074-pooler.us-east-1.aws.neon.tech",#os.environ.get("DB_HOST") # 数据库服务器的主机地址
+        'NAME': os.environ.get("DB_NAME"), # 数据库名称
+        'USER': os.environ.get("DB_USER"), # 登录数据库用户名
+        'PASSWORD': os.environ.get("DB_PASSWORD"), # 登录数据库密码
+        'HOST': os.environ.get("DB_HOST") # 数据库服务器的主机地址
+        #'PORT': '' # 数据库服务的端口号
     }
 }
+
 
 # DATABASES = {
 #     'default': {
